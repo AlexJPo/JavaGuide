@@ -1,0 +1,84 @@
+﻿Java SE
+
+1) https://www.youtube.com/playlist?list=PLIU76b8Cjem48KXIy83YIm-QM6SwvzjQd
+2) http://java-online.ru/swing-joptionpane.xhtml
+3) http://docs.oracle.com/javase/tutorial/uiswing/components/componentlist.html
+4) http://www.javatpoint.com/how-to-make-an-executable-jar-file-in-java
+5) https://www.youtube.com/watch?v=vW2Y7r-vbNw&list=PLNclrLF8MXOwCFz7z13sXj3f7IJcAiENg&ab_channel=%D0%9E%D0%B1%D1%80%D0%B0%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5%D0%BE%D0%BD%D0%BB%D0%B0%D0%B9%D0%BD
+6) https://www.youtube.com/watch?v=Jn23UmO_M_0&list=PLEvI1OiL1F3fpQYpc8eNX4lbTUwMLzpWi?&ab_channel=ZhirniToni
+
+https://jsehelper.blogspot.ru/2016/01/blog-post_59.html - вопросы для собеседования
+
+1) Чтение пользовательских данных из консоли
+	подключаемя java.util.Scanner
+	Инициализируем переменную и указываем поток:
+		Scanner sc = new Scanner(System.in);
+	Для вывода потока обращаемся к переменной:
+		sc.nextLine()
+
+2) JFrame
+	создаем отдельный класс для окна наследуя JFrame:
+		public class frame extends JFrame {
+			private JLabel label;
+			public frame() {
+				super("Title of frame");
+				setLayout(new FlowLayout());
+
+				label = new JLabel("Some text: ");
+				label.setToolTipText("ToolTip text - on hovered label");
+				add(label);
+			}
+		}
+	подключаем в классе пакеты:
+		import java.awt.FlowLayout;
+		import javax.swing.JFrame;
+		import javax.swing.JLabel;
+	указываем текст окна:
+		super("Title of frame");
+	создаем переменную объекта:
+		private JLabel label;
+	инициализируем объект:
+		label = new JLabel("Some text: ");
+	добавляем объект на форму:
+		add(label);
+	инициализируем класс и вызываем его:
+		frame f = new frame();
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setSize(200, 300);
+		f.setVisible(true);
+	подключаем пакет:
+		javax.swing.JFrame;
+
+3) Event
+	подключить пакеты:
+		import java.awt.event.ActionListener;
+		import java.awt.event.ActionEvent;
+	добавить класс обработчика событий из интерфейса ActionListener:
+		private class thehandler implements ActionListener {
+			public void actionPerformed(ActionEvent event) {
+				String result = event.getActionCommand();
+				System.out.println(result);
+			}
+		}
+	внутри класса инициализируем метод интерфейса ActionListener:
+		public void actionPerformed(ActionEvent event) {
+			String result = event.getActionCommand();
+			System.out.println(result);
+		}
+	для получения введенного в поле значения:
+		event.getActionCommand();
+	инициализируем класс обработки события:
+		thehandler handler = new thehandler();
+	добавляем событие елементу:
+		textField.addActionListener(handler);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

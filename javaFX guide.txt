@@ -1,0 +1,107 @@
+﻿Java FX
+1) https://www.youtube.com/playlist?list=PLgZIR_u-_cLq84WzlMaGdY5-9UuRPo0Sa
+2) https://www.youtube.com/playlist?list=PLwwk4BHih4fi1rkT7XAHrwya3Qjuo63AK
+3) https://www.youtube.com/playlist?list=PLFE2CE09D83EE3E28
+
+Для работы необходим Java FX Scen Builder, IDE, JavaFX.
+
+1) CSS:
+	поддерживаются не все стиили,
+	через . указывается элемент из fxml файла, если у него не указан id.
+	через # указывается id эолемента из fxml файла, если у него задан id.
+
+2) FXML:
+	имя контроллера указывается через fx:id="пакет.контроллер" в главном теге разметки
+	fx:id - используется для связи элемента с контроллером
+	id - для использования в файле css
+	onAction = "#названиеМетода" - для объявления метода
+
+3) Controller:
+	@FXML
+	private String <название элемента по fx:id>
+
+4) TableView
+	для вывода данных в таблицу необходимо изменить контейнер данных на:
+		private ObservableList<Person> personList = FXCollections.observableArrayList();б
+	подключив при этом:
+		import javafx.collections.FXCollections;
+		import javafx.collections.ObservableList;
+	в fxml файле у столбцов таблицы задать fx:id
+	в файле контроллера добавить:
+		@FXML
+		private TableView<Класс> personsTable;
+		@FXML
+		private TableColumn<Класс, тип используемых данных> columnFio;
+		@FXML
+		private TableColumn<Класс, тип используемых данных> columnPhone;
+	в файле контроллера добавить метод инициализации: 
+		@FXML
+		private void initialize() {
+			columnFio.setCellValueFactory(new PropertyValueFactory<Person, String>("fio"));
+			columnPhone.setCellValueFactory(new PropertyValueFactory<Person, String>("phone"));
+
+			cab.FillTestData();
+
+			personsTable.setItems(cab.getPersonList());
+			updateCountLabel();
+		}
+	в этом методе определить PropertyChange:
+		название столбца.setCellValueFactory(new PropertyValueFactory<Класс, тип данных>("название поля из Класса"));
+		public class Person {
+			private String fio;
+			private String phone;
+
+			public Person(String fio, String phone) {
+				this.fio = fio;
+				this.phone = phone;
+			}
+
+			public String getFio() { return this.fio; }
+			public void setFio(String fio) { this.fio = fio; }
+
+			public String getPhone() { return this.phone; }
+			public void setPhone(String phone) { this.phone = phone; }
+		}
+	заполнить данными таблицу:
+		personsTable.setItems(cab.getPersonList());
+
+5) Открытие диалогового окна
+	на кнопку добавляем метод
+	создаем метод в контроллере:
+		public void ShowDialog(ActionEvent event)
+		{
+			try {
+				Stage stage = new Stage();
+				Parent view = FXMLLoader.load(getClass().getResource("edit.fxml"));
+
+				stage.setTitle("Add new person");
+				stage.setResizable(false);
+				stage.setScene(new Scene(view));
+				stage.initModality(Modality.WINDOW_MODAL);
+				stage.initOwner(((Node)event.getSource()).getScene().getWindow());
+				stage.show();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+	инициализируем переменную Stage:
+		Stage stage = new Stage();
+	получаем fxml view файл диалогового окна:
+		Parent view = FXMLLoader.load(getClass().getResource("edit.fxml"));
+	задаем параметры
+	инициализируем модальное окно:
+		stage.initModality(Modality.WINDOW_MODAL);
+		stage.initOwner(((Node)event.getSource()).getScene().getWindow());
+
+6) Закрытие диалогового окна
+	в fxml у кнопки задается метод и выставляется cancelButton="true":
+		<Button fx:id="btnCancel" mnemonicParsing="false" text="Cancel" cancelButton="true" onAction="#cancelDialog" />
+	в контроллере создается метод(именно public):
+		public void cancelDialog(ActionEvent event) {
+			Node source = (Node) event.getSource();
+			Stage scene = (Stage) source.getScene().getWindow();
+			scene.close();
+		}
+	в методе получает из события "источник"
+	в методе получает "сцену"(активное окно) и закрываем его
+	так же теперь по нажатию "ESC" диалоговое окно будет закрыто
