@@ -71,14 +71,107 @@ https://jsehelper.blogspot.ru/2016/01/blog-post_59.html - вопросы для 
 		thehandler handler = new thehandler();
 	добавляем событие елементу:
 		textField.addActionListener(handler);
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+4) JTable
+	создаем модель данных бд:
+		public class Persons {
+			private String fio;
+			private String phone;
+
+			public Persons() {
+				this.fio = "";
+				this.phone = "";
+			}
+			public Persons(String fio, String phoneNumber) {
+				this.fio = fio;
+				this.phone = phoneNumber;
+			}
+			public String getFIO() { return this.fio; }
+			public void setFIO(String fio) { this.fio = fio; }
+			public String getPhone() { return this.phone; }
+			public void setPhone(String phoneNumber) { this.phone = phoneNumber; }
+		}
+	создаем модель таблицы, унаследованную от AbstractTableModel:
+		public class TableModel extends AbstractTableModel {
+			private final int columnsCount = 2;
+			private ArrayList<Persons> personsList;
+
+			public TableModel() {
+				personsList = new ArrayList<Persons>();
+				personsList.add(new Persons("Vital", "123456"));
+				personsList.add(new Persons("Sanya", "36545"));
+				personsList.add(new Persons("Alex", "228229"));
+			}
+			@Override
+			public int getColumnCount() { return columnsCount; }
+			@Override
+			public int getRowCount() { return personsList.size(); }
+			@Override
+			public String getColumnName(int columnIndex) {
+				switch (columnIndex) {
+					case 0: return "FIO";
+					case 1: return "Phone";
+				}
+				return "";
+			}
+			@Override
+			public Object getValueAt(int rowIndex, int columnIndex) {
+				Persons selectedRow = personsList.get(rowIndex);
+				switch (columnIndex) {
+					case 0:
+						return selectedRow.getFIO();
+					case 1:
+						return selectedRow.getPhone();
+				}
+				return "";
+			}
+		}
+	в классе инициализируем дефолтные метоты абстрактного класса:
+			@Override
+			public int getColumnCount() { }
+			@Override
+			public int getRowCount() { }
+			@Override
+			public Object getValueAt(int rowIndex, int columnIndex) { }
+	создаем массив хранящий объекты базы данных:
+		private ArrayList<Persons> personsList;
+	создаем конструктор класса:
+		public TableModel() {
+			personsList = new ArrayList<Persons>();
+			personsList.add(new Persons("Vital", "123456"));
+			personsList.add(new Persons("Sanya", "36545"));
+			personsList.add(new Persons("Alex", "228229"));
+		}
+	инициализируем модель таблицы:
+		TableModel personsTable = new TableModel();
+	инициализируем компонент JTable:
+		JTable table = new JTable(personsTable);
+	инициализируем компонент JScrollPane:
+		JScrollPane scrollPane = new JScrollPane(table);
+	добавляем на фрейм компонент JScrollPane:
+		frame.add(scrollPane);
+
+5) JMenu
+	создаем обертку под меню:
+		JMenuBar menuBar = new JMenuBar();
+	создаем первый пункт меню:
+		JMenu menu1 = new JMenu("menu 1");
+	создаем подпункты меню:
+		JMenuItem menuItem1 = new JMenuItem("item 1");
+		JMenuItem menuItem2 = new JMenuItem("item 2");
+	добавляем подпункты в пункт меню:
+		menu1.add(menuItem1);
+		menu1.add(menuItem2);
+	если необходимо добавляем сепаратор:
+		menu1.addSeparator();
+	добавляем меню в обертку:
+		menuBar.add(menu1);
+	добавляем обертку на форму:
+		frame.setJMenuBar(menuBar);
+		
+		
+		
+		
+		
+		
 	
