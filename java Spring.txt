@@ -1,0 +1,119 @@
+﻿1) bean используется для описания класса(например):
+	public class Drivers {
+		private String a;
+		private int b;
+		public Drivers(String a, int b) {
+			this.a = a;
+			this.b = b;
+		}
+	}
+
+2) создается в пакете файл bean.xml
+	<beans>
+	</beans>
+
+3) добавления описания класса через bean:
+	<bean id="test" class="Путь к классу.Название класса">
+		<constructor-arg name="название переменное" value="значенеи переменной" type="тип переменной(int, String)">
+		<constructor-arg index="0" value="значенеи переменной" type="тип переменной(int, String)">
+	</bean>
+
+4) для описания конструктора класса используется:
+	<constructor-arg name="название переменное" value="значенеи переменной" type="тип переменной(int, String)">
+
+4.1) так же к переменным можно обращатсья по индекусу:
+	<constructor-arg index="0" value="значенеи переменной" type="тип переменной(int, String)">
+	index - номер переменной в конструкторе класса
+
+5) в main.java подключаем bean.xml
+	ApplicationContext apx = new ClassPathXmlApplicationContext("bean.xml");
+
+6) для вызова описанного класса:
+	ClassName className = (ClassName) apx.getBean("id бина");
+
+7) для оисания метода класса, который возвращает Object (фабричный метод):
+	<bean id="test" class="Путь к классу.Название класса" factory-method="название фабричного метода">
+		<constructor-arg name="название переменное" value="значенеи переменной" type="тип переменной(int, String)">
+		<constructor-arg index="0" value="значенеи переменной" type="тип переменной(int, String)">
+	</bean>
+	
+7.1) для описания инициализирующего метода класса используется атрибут:
+	<bean id="test" class="Путь к классу.Название класса" init-method="название метода">
+	</bean>
+
+8) для указания гетеров и сетеров:
+	<bean id="test" class="Путь к классу.Название класса">
+		<property name="a" value="" />
+	</bean>
+	
+	так же обязательно описание публичного set метода для переменной,
+	т.к. мы не сможем получить без него доступк к приватнйо переменной класса
+	и при компиляции получим ошибку
+
+9) если одна из переменных класса является другим объектом:
+	<bean id="test" class="Путь к классу.Название класса">
+		<property name="название объекта" ref="ссылка на id другого bean" />
+	</bean>
+
+	<bean id="ссылка на id другого bean" class="Путь к классу.Название класса">
+	</bean>
+
+10) для тоого что бы описать List<Объект>:
+	<bean id="test" class="Путь к классу.Название класса">
+		<property name="название переменной листа">
+			<list>
+				<value>значение</value>
+				<value>значение</value>
+				<value>значение</value>
+				<value>значение</value>
+				и т.д.
+			</list>
+		</property>
+	</bean>
+
+	<list></list> - может использовать 3и формы записи
+
+11) для описания в листе объектов:
+	<bean id="test" class="Путь к классу.Название класса">
+		<property name="название переменной листа">
+			<list>
+				<bean id="id описания класса" class="Путь к классу.Название класса">Описание класса</bean>
+				<bean id="id описания класса" class="Путь к классу.Название класса">Описание класса</bean>
+				<bean id="id описания класса" class="Путь к классу.Название класса">Описание класса</bean>
+				и т.д.
+			</list>
+		</property>
+	</bean>
+	
+12) так же можно использовать ссылку на класс:
+	<bean id="id описания класса" class="Путь к классу.Название класса">
+	</bean>
+
+	<bean id="test" class="Путь к классу.Название класса">
+		<property name="название переменной листа">
+			<list>
+				<ref>id описания класса</ref>
+				<ref>id описания класса</ref>
+				<ref>id описания класса</ref>
+				и т.д.
+			</list>
+		</property>
+	</bean>
+	
+13) для использования другого имени бина используется <alias>^
+	<bean id="id описания класса" class="Путь к классу.Название класса">
+	</bean>
+	
+	<alias id="id описания класса" name="new_bean_name" />
+	
+	и при выхове в программном коде можн ообращаться как по id, так и по alias
+		ClassName className = (ClassName) apx.getBean("id бина");
+		ClassName className = (ClassName) apx.getBean("имя alias");
+	
+	
+	
+	
+	
+	
+	
+	
