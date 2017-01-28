@@ -1,4 +1,8 @@
-﻿1) bean используется для описания класса(например):
+﻿1) http://spring-projects.ru/guides
+2) https://www.youtube.com/playlist?list=PLwwk4BHih4fho6gmaAwdHYZ6QQq0aE7Zi
+
+
+1) bean используется для описания класса(например):
 	public class Drivers {
 		private String a;
 		private int b;
