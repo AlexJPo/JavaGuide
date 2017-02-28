@@ -1,0 +1,58 @@
+https://www.youtube.com/watch?v=8-iQDUl10vM&list=PLEAQNNR8IlB4R7NfqBY1frapYo97L6fOQ
+
+1) строка подключения:
+jdbc:<dreiver protocol>:<driver connection details>
+MS SQL Server - 	jdbc:odbc:DataBaseName
+Oracle -  			jdbc:oracle:thin@myserver:1521:DataBaseName
+MySQLr -			jdbc:mysql://localhost:3306/DataBaseName
+
+2) Подключение к бд
+import java.sql.*
+...
+String dbUrl = "jdbc:odbc:DataBaseName";
+String user = "admin";
+String password = "123456";
+
+Connection connection = DriverManager.getConnection(dbUrl, user, password);
+
+3) Создание statment
+Statement statment = connection.createStatment();
+
+4) Запрос к бд
+ResultSet resultSet = statment.executeQuery("select * from ...");
+
+5) Проход по циклу полученных значений
+while (resultSet.next()) {
+	//todo something
+}
+
+6) Получение зачения столбца:
+while (resultSet.next()) {
+	System.out.println(resultSet.getString("column_name"));
+}
+
+7) Для обновления, редактирования, удаления используется:
+executeUpdate(<query>);
+
+8) Для защиты от sql иньекций и валидации параметров используется:
+PreparedStatement prepareStatment = connection.preparedStatment(select * from <TABLE> where cost > ?);
+Где знак вопроса("?") - некий подставляемый параметр
+
+9) Что бы указать подставляемый параметр:
+prepareStatment.setString(<номер параметра>, <значение параметра>);
+prepareStatment.setDouble(<номер параметра>, <значение параметра>);
+и т.д.
+
+10) Получение результата для PreparedStatement:
+resultSet = prepareStatment.executeQuery();
+
+
+
+
+
+
+
+
+
+
+

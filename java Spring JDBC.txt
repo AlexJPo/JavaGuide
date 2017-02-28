@@ -1,0 +1,147 @@
+﻿1) с помощью maven или grudl подключаем библиотеки:
+    compile 'org.springframework:spring-context:4.3.6.RELEASE'
+    compile("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
+    compile("org.springframework:spring-jdbc:latest.release")
+
+2) для работы с sql server необходимо скачать и подключить jar файл драйвера
+3) Как обычно создаем модель бд
+4) создаем xml файл настроек подключения к бд:
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+    <context:component-scan base-package="ru.music.*" />
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+        <property name="url" value="jdbc:sqlserver://localhost;databaseName=Music;" />
+        <property name="username" value="sa" />
+        <property name="password" value="123456" />
+    </bean>
+</beans>
+
+5) в Реализации модели класса, описывающего таблицу бд:
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
+import java.sql.ResultSet;;
+import java.sql.SQLException;
+import java.util.List;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component("sqlServerDao")
+public class SqlMP3Dao implements MP3Dao {
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    }
+	....
+}
+
+ - названеи бина в main файле: @Component("sqlServerDao")
+
+6) задаем метод, для чтения подключеняи к бд:
+	@Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    }
+
+7) в main файле:
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
+
+public class MusicMain {
+    public static void main(String[] args) {
+        ApplicationContext context = new ClassPathXmlApplicationContext("context.xml");
+        MP3Dao sqlServerDao = (MP3Dao) context.getBean("sqlServerDao");
+
+        System.out.println(sqlServerDao.getById(2));
+    }
+}
+
+ - получаем xml конфиг: ApplicationContext context = new ClassPathXmlApplicationContext("context.xml")
+ - получаем контекст: MP3Dao sqlServerDao = (MP3Dao) context.getBean("sqlServerDao");
+
+ 
+8) при использовании параметров в запросах используется NamedParameterJdbcTemplate:
+    public void insert(MP3 mp3) {
+        String sql = "INSERT INTO Music (Name, Author) VALUES (:name, :author)";
+
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+        namedParameters.addValue("name", mp3.getName());
+        namedParameters.addValue("author", mp3.getAuthor());
+
+        jdbcTemplate.update(sql, namedParameters);
+    }
+
+9) при возвращении объекта используется RowMapper<MP3> интерфейс(обязательно статичный):
+
+private static final class MP3RowMapper implements RowMapper<MP3> {
+    @Override
+    public MP3 mapRow(ResultSet rs, int rowNum) throws SQLException {
+        MP3 mp3 = new MP3();
+        mp3.setName(rs.getString("Name"));
+        mp3.setAuthor(rs.getString("Author"));
+
+        return mp3;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
