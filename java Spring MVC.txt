@@ -1,0 +1,151 @@
+﻿https://spring.io/guides/gs/serving-web-content/
+http://www.thymeleaf.org/documentation.html
+
+
+1) в сборщике проектов подключаем:
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("org.springframework.boot:spring-boot-devtools")
+}
+
+
+2) создаем ApplicationStart в рут пакете:
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ApplicationStart {
+
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(ApplicationStart.class, args);
+    }
+}
+
+
+3) создаем пакет для контроллеров и добавляем в нее классы контроллеров:
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class IndexController {
+    @RequestMapping("/")
+    public String index() {
+        return "index";
+    }
+}
+
+@Controller - анатация контроллера
+@RequestMapping("/") - ури, по которому будем попадать в данный метод
+
+
+4) в resources создаем директорию templates, в которой будт находится все html файлы страниц
+
+
+5) в каждом файле необходимо указать:
+<html lang="en" xmlns:th="http://www.thymeleaf.org"> - что бы мы могли работать как с html страницей
+
+
+6) для передачи параметров через get запрос:
+@RequestMapping(value = "/home",  method = RequestMethod.GET)
+public String home(@RequestParam(value="name", required=false, defaultValue="World") String name, Model model) {
+    model.addAttribute("name", name);
+    return "home";
+}
+
+@RequestMapping(value = "/home",  method = RequestMethod.GET) - указывается ури и метод
+
+
+7) В методе сонктроллера указывается паметр:
+@RequestParam(value="name", required=false, defaultValue="World")
+
+
+8) В методе контроллера объявляются параметры:
+String name, Model model
+
+
+9) Для подключения стилей, скриптов и других файлов, необходимо в "resources" создать директорию "static"
+resources
+	static
+		css
+			style.css
+		js
+			js.css
+		img
+
+10) Что бы подключить файл скриптов/стилей в html с исользованием thymeleaf:
+	<link rel="stylesheet" type="text/css" href="../../css/style.css" th:href="@{/css/style.css}" />
+    <script type="text/javascript" src="../../js/test.js" th:src="@{/js/test.js}"  />
+
+
+11) для получения единичного параметра в методе на сервере:
+@PostMapping("/login")
+public String login(@RequestParam String username, Model model) {
+    model.addAttribute("user", username);
+    return "home";
+}
+
+12) для приема и передачи модели на сервере:
+@GetMapping("/home")
+public String home(Model model) {
+    model.addAttribute("userModel", new User());
+    return "home";
+}
+ 
+@PostMapping("/home")
+public String login(@ModelAttribute User userModel, Model model) {
+	model.addAttribute("userModel", userModel);
+    return "result";
+}
+
+13) в html странице:
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap/bootstrap.min.css" th:href="@{../../css/bootstrap/bootstrap.min.css}" />
+</head>
+<body>
+    <div class="content">
+        <form name="form" th:action="@{/home}" th:object="${userModel}" action="/home" method="POST">
+            <fieldset>
+                <input class="form-control" type="text" name="username" th:field="*{userName}" value="" placeholder="Username" />
+                <input class="form-control" type="password" name="password" th:field="*{password}" placeholder="Password" />
+            </fieldset>
+            <input type="submit" id="login" value="Login" class="btn btn-primary" />
+        </form>
+    </div>
+
+    <div th:if="${userModel.userName != ''}">
+        <p th:text="${userModel.userName}"></p>
+        <p th:text="${userModel.password}"></p>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script type="text/javascript" src="../../js/bootstrap/bootstrap.min.js" th:src="@{../../js/bootstrap/bootstrap.min.js}"  />
+</body>
+</html>
+
+userModel - название модели класса
+
+
+
+
+
+

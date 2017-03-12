@@ -97,6 +97,14 @@ private static final class MP3RowMapper implements RowMapper<MP3> {
     }
 }
 
+10) Для добавления данных массивом используется Batch:
+public int insertList(List<MP3> mp3) {
+    String sql = "INSERT INTO Music (Name, Author) VALUES (:name, :author)";
+    SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(mp3.toArray());
+    int[] insertedRecords = jdbcTemplate.batchUpdate(sql, batch);
+
+    return insertedRecords.length;
+}
 
 
 
