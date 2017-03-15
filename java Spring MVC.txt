@@ -144,8 +144,95 @@ public String login(@ModelAttribute User userModel, Model model) {
 
 userModel - название модели класса
 
+14) валидация формы:
+public String login(@Valid @ModelAttribute("userModel") User userModel, BindingResult bindingResult, Model model) {
+    if (bindingResult.hasErrors()) {
+        return "home";
+    }
+    model.addAttribute("userModel", userModel);
+    return "home";
+}
+
+- в классе:
+public class User {
+    @NotNull
+    @Size(min = 2, max = 30)
+    private String userName;
+
+    @NotNull
+    @Size(min = 6, max = 10)
+    private String password;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+
+- html:
+<fieldset>
+    <input class="form-control" type="text" name="username" th:field="*{userName}" value="" placeholder="Username" />
+    <span th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"></span>
+
+    <input class="form-control" type="password" name="password" th:field="*{password}" placeholder="Password" />
+    <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+</fieldset>
 
 
+15) Для приема json с сервера:
+@RestController
+public class RESTfullController {
+    @RequestMapping("/restfull")
+    public User getUser(@RequestParam(value="name", defaultValue="World") String name) {
+        User user = new User();
+        user.setUserName(name);
+        return user;
+    }
+}
+
+@RestController - тип контроллера
+В адресной строке пишем: запрос:
+http://localhost:8080/restfull?name=Alex123
 
 
+16) Для получения с сервера ответа в формате xml:
+@XmlRootElement - обязательно для описаняи класса
+public class User {
+    @NotNull
+    @Size(min = 2, max = 30)
+    private String userName;
+    @NotNull
+    @Size(min = 6, max = 10)
+    private String password;
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
 
+- в опиании метода:
+@RequestMapping(value = "/restfull", produces = "application/xml") - обязательно указать тип возвращаемого контента
+public User getUser(@RequestParam(value="name", defaultValue="World") String name) {
+    User user = new User();
+    user.setUserName(name);
+    return user;
+}
