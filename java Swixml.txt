@@ -1,0 +1,57 @@
+http://grepcode.com/file/repo1.maven.org/maven2/org.swixml/swixml-examples-showcase/2.6.20130530/examples/legacy/MenuBarWithConstraints.java?av=f
+https://github.com/swixml/
+
+1) создаем файл xml:
+<?xml version="1.0" encoding="UTF-8"?>
+<frame size="640,280" id="mainFrame" title="Hello SWIXML World" defaultCloseOperation="JFrame.EXIT_ON_CLOSE">
+
+  <panel constraints="BorderLayout.CENTER">
+    <label labelfor="tf" text="Hello World!"/>
+    <textfield id="tf" columns="20" Text="Swixml"/>
+    <button text="Click Here" action="UpdateStyle"/>
+  </panel>
+
+</frame>
+
+2) в классе пишем:
+- если в main классе
+public class AppStarter {
+	private AppStarter() throws Exception {
+		new SwingEngine( this ).render( "homework/xml/main.xml" ).setVisible( true );
+	}
+	public static void main(String[] args) {
+		try {
+			new AppStarter();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+3) для инициализации метода пишем:
+- в xml файле разметки у тега action="названи метода"
+<button text="Click Here" action="UpdateStyle"/>
+- в класса:
+	public Action UpdateStyle = new AbstractAction() {
+		@Override
+		public void actionPerformed(ActionEvent arg0) { ... }
+	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

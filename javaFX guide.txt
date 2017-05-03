@@ -105,3 +105,30 @@
 	в методе получает из события "источник"
 	в методе получает "сцену"(активное окно) и закрываем его
 	так же теперь по нажатию "ESC" диалоговое окно будет закрыто
+
+7) Подгружаем view 
+private final String MAIN_WINDOW = "/lift/views/main.fxml";
+
+FXMLLoader fxmlLoader = new FXMLLoader();
+fxmlLoader.setLocation(getClass().getResource(MAIN_WINDOW));
+
+Parent mainWindow = fxmlLoader.load();
+
+8) Добавляем сцену и указываем файл стилей
+Scene scene = new Scene(mainWindow, 400, 400);
+scene.getStylesheets().add(getClass().getResource("/dir/style/css/application.css").toExternalForm());
+
+9) В файде разметки пишем:
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="dir.controller.DirectoryExplorer">
+</BorderPane>
+
+fx:controller="dir.controller.DirectoryExplorer" - путь к контроллеру

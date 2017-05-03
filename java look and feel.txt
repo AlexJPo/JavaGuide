@@ -1,0 +1,42 @@
+http://www.java2s.com/Tutorial/Java/0240__Swing/ChangingtheLookandFeel.htm
+http://www.roseindia.net/java/example/java/swing/GettingAndSettingLAF.shtml
+http://javadesktop.org/articles/synth/
+https://docs.oracle.com/javase/8/docs/api/javax/swing/plaf/synth/doc-files/synthFileFormat.html#e.imagePainter
+
+1) создается xml файл:
+<?xml version="1.0" encoding="UTF-8"?>
+<synth>
+	<style id="textfield">
+		<insets top="4" left="6" bottom="4" right="6"/>
+		<state>
+			<font name="Verdana" size="14"/>
+			<color value="#D2DFF2" type="BACKGROUND"/>
+			<color value="blue" type="TEXT_FOREGROUND"/>
+		</state>
+	</style>
+	<bind style="textfield" type="region" key="TextField"/>
+</synth>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<synth>...</synth>
+Обязательная конструкция, без которой работать не будет
+
+2) стили задаются в тега:
+<style id="textfield"></style>
+- id, атрибут имени стиля
+
+3) для применения стиля используется:
+<bind style="textfield" type="region" key="TextField"/>
+- style, id применяемого стиля
+- type, "region" применяется к элементу, "name" применяется к элементу по его имени
+- key, тип "region", то пишется название тега(label, textfield, button),
+	если тип "name", то пишется имя тега, к которому применяется стиль(myLabel,tbUser)
+
+4) программно стили подключаются:
+	SynthLookAndFeel laf = new SynthLookAndFeel();
+	InputStream inputStream = AppStarter.class.getClassLoader().getResourceAsStream("homework/xml/laf.xml");
+	laf.load(inputStream, AppStarter.class);
+	UIManager.setLookAndFeel(laf);
+
+5) для применения стилей после загрузки основного окна:
+SwingUtilities.updateComponentTreeUI(mainFrame);
