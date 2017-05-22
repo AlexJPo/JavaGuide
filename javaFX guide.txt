@@ -2,6 +2,7 @@
 1) https://www.youtube.com/playlist?list=PLgZIR_u-_cLq84WzlMaGdY5-9UuRPo0Sa
 2) https://www.youtube.com/playlist?list=PLwwk4BHih4fi1rkT7XAHrwya3Qjuo63AK
 3) https://www.youtube.com/playlist?list=PLFE2CE09D83EE3E28
+4) https://www.youtube.com/channel/UCzLxgOC73OVLR3zS-SeOkiQ/videos?&ab_channel=VladislavKavunenko - animation
 
 Для работы необходим Java FX Scen Builder, IDE, JavaFX.
 

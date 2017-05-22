@@ -4,13 +4,11 @@ https://github.com/swixml/
 1) создаем файл xml:
 <?xml version="1.0" encoding="UTF-8"?>
 <frame size="640,280" id="mainFrame" title="Hello SWIXML World" defaultCloseOperation="JFrame.EXIT_ON_CLOSE">
-
   <panel constraints="BorderLayout.CENTER">
     <label labelfor="tf" text="Hello World!"/>
     <textfield id="tf" columns="20" Text="Swixml"/>
     <button text="Click Here" action="UpdateStyle"/>
   </panel>
-
 </frame>
 
 2) в классе пишем:
@@ -37,7 +35,13 @@ public class AppStarter {
 		public void actionPerformed(ActionEvent arg0) { ... }
 	};
 
+4) что бы подт€гивались картинки, указанные в атрибуте path в LookAndFeel xml файле, sytch, 
+необходимо, что бы директорию, на которую ссылаетс€ атрибут была в той же папке, где и файл,
+который к ней обращаетс€
 
+5) дл€ отображени€ разметки используютс€ следующие метоыд SwingEngine:
+render 
+insert
 
 
 
