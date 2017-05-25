@@ -114,3 +114,9 @@ scene.getStylesheets().add(getClass().getResource("/dir/style/css/application.cs
 </BorderPane>
 
 fx:controller="dir.controller.DirectoryExplorer" - путь к контроллеру
+
+10) Для работы с свойствами fxml элементов:
+minorPotion.getProperties().put("potionType", "minor");
+getProperties() - получаем свойства
+.put(ключ, значение) - добавление нового свойства
+.get(ключ) - получение свойсва
