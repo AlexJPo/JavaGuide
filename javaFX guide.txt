@@ -22,15 +22,15 @@
 	private String <название элемента по fx:id>
 
 4) TableView
-	для вывода данных в таблицу необходимо изменить контейнер данных на:
-		private ObservableList<Person> personList = FXCollections.observableArrayList();б
+	для вывода данных в таблицу необходимо изменить контейнер c List, ArrayList на:
+		private ObservableList<T> personList = FXCollections.observableArrayList();
 	подключив при этом:
 		import javafx.collections.FXCollections;
 		import javafx.collections.ObservableList;
 	в fxml файле у столбцов таблицы задать fx:id
 	в файле контроллера добавить:
 		@FXML
-		private TableView<Класс> personsTable;
+		private TableView<T> personsTable;
 		@FXML
 		private TableColumn<Класс, тип используемых данных> columnFio;
 		@FXML
@@ -38,33 +38,14 @@
 	в файле контроллера добавить метод инициализации: 
 		@FXML
 		private void initialize() {
-			columnFio.setCellValueFactory(new PropertyValueFactory<Person, String>("fio"));
-			columnPhone.setCellValueFactory(new PropertyValueFactory<Person, String>("phone"));
+			columnFio.setCellValueFactory(new PropertyValueFactory<T, тип возвращаемых данных>("поле класса, которое будет отображать в колонке"));
+			columnPhone.setCellValueFactory(new PropertyValueFactory<T, тип возвращаемых данных>("поле класса, которое будет отображать в колонке"));
 
-			cab.FillTestData();
-
-			personsTable.setItems(cab.getPersonList());
-			updateCountLabel();
+			personsTable.setItems(personList);
 		}
-	в этом методе определить PropertyChange:
-		название столбца.setCellValueFactory(new PropertyValueFactory<Класс, тип данных>("название поля из Класса"));
-		public class Person {
-			private String fio;
-			private String phone;
-
-			public Person(String fio, String phone) {
-				this.fio = fio;
-				this.phone = phone;
-			}
-
-			public String getFio() { return this.fio; }
-			public void setFio(String fio) { this.fio = fio; }
-
-			public String getPhone() { return this.phone; }
-			public void setPhone(String phone) { this.phone = phone; }
-		}
-	заполнить данными таблицу:
-		personsTable.setItems(cab.getPersonList());
+	для заполнения таблицы данными вызываем метод:
+		personsTable.setItems(personList);
+	
 
 5) Открытие диалогового окна
 	на кнопку добавляем метод
