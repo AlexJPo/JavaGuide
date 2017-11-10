@@ -1,0 +1,127 @@
+﻿/* Output: (Sample)
+--- Array as List ---
+ size     get     set
+   10     130     183
+  100     130     164
+ 1000     129     165
+10000     129     165
+--------------------- ArrayList ---------------------
+ size     add     get     set iteradd  insert  remove
+   10     121     139     191     435    3952     446
+  100      72     141     191     247    3934     296
+ 1000      98     141     194     839    2202     923
+10000     122     144     190    6880   14042    7333
+--------------------- LinkedList ---------------------
+ size     add     get     set iteradd  insert  remove
+   10     182     164     198     658     366     262
+  100     106     202     230     457     108     201
+ 1000     133    1289    1353     430     136     239
+10000     172   13648   13187     435     255     239
+----------------------- Vector -----------------------
+ size     add     get     set iteradd  insert  remove
+   10     129     145     187     290    3635     253
+  100      72     144     190     263    3691     292
+ 1000      99     145     193     846    2162     927
+10000     108     145     186    6871   14730    7135
+-------------------- Queue tests --------------------
+ size    addFirst     addLast     rmFirst      rmLast
+   10         199         163         251         253
+  100          98          92         180         179
+ 1000          99          93         216         212
+10000         111         109         262         384
+*///:~
+ 
+
+ /* Output: (Sample)
+------------- TreeSet -------------
+ size       add  contains   iterate
+   10       746       173        89
+  100       501       264        68
+ 1000       714       410        69
+10000      1975       552        69
+------------- HashSet -------------
+ size       add  contains   iterate
+   10       308        91        94
+  100       178        75        73
+ 1000       216       110        72
+10000       711       215       100
+---------- LinkedHashSet ----------
+ size       add  contains   iterate
+   10       350        65        83
+  100       270        74        55
+ 1000       303       111        54
+10000      1615       256        58
+*///:~
+ 
+The performance of HashSet is generally superior to TreeSet, but especially when adding elements and looking them up, 
+which are the two most important operations. 
+TreeSet exists because it maintains its elements in sorted order, so you use it only when you need a sorted Set. 
+Because of the internal structure necessary to support sorting and because iteration is something you more likely to do, 
+iteration is usually faster with a TreeSet than a HashSet.
+
+Note that LinkedHashSet is more expensive for insertions than HashSet; 
+this is because of the extra cost of maintaining the linked list along with the hashed container.
+
+Choosing between Maps
+This program gives an indication of the trade-off between Map implementations:
+
+/* Output: (Sample)
+---------- TreeMap ----------
+ size     put     get iterate
+   10     748     168     100
+  100     506     264      76
+ 1000     771     450      78
+10000    2962     561      83
+---------- HashMap ----------
+ size     put     get iterate
+   10     281      76      93
+  100     179      70      73
+ 1000     267     102      72
+10000    1305     265      97
+------- LinkedHashMap -------
+ size     put     get iterate
+   10     354     100      72
+  100     273      89      50
+ 1000     385     222      56
+10000    2787     341      56
+------ IdentityHashMap ------
+ size     put     get iterate
+   10     290     144     101
+  100     204     287     132
+ 1000     508     336      77
+10000     767     266      56
+-------- WeakHashMap --------
+ size     put     get iterate
+   10     484     146     151
+  100     292     126     117
+ 1000     411     136     152
+10000    2165     138     555
+--------- Hashtable ---------
+ size     put     get iterate
+   10     264     113     113
+  100     181     105      76
+ 1000     260     201      80
+10000    1245     134      77
+*///:~
+ 
+Insertions for all the Map implementations except for IdentityHashMap get significantly slower as the size of the Map gets large. 
+In general, however, lookup is much cheaper than insertion, which is good because youll typically be looking items 
+up much more often than you insert them.
+
+Hashtable performance is roughly the same as HashMap. Since HashMap is intended to replace Hashtable, 
+and thus uses the same underlying storage and lookup mechanism (which you will learn about later) this is not too surprising.
+
+A TreeMap is generally slower than a HashMap. As with TreeSet, a TreeMap is a way to create an ordered list. 
+The behavior of a tree is such that its always in order and doesnt have to be specially sorted. 
+Once you fill a TreeMap, you can call keySet( ) to get a Set view of the keys, then toArray( ) to produce an array of those keys. 
+You can then use the static method Arrays.binarySearch( ) to rapidly find objects in your sorted array.
+Of course, this only makes sense if the behavior of a HashMap is unacceptable, since HashMap is designed to rapidly find keys. 
+Also, you can easily create a HashMap from a TreeMap with a single object creation or call to putAll(). 
+In the end, when youre using a Map, your first choice should be HashMap, and only if you need a constantly sorted Map will you need TreeMap.
+
+LinkedHashMap tends to be slower than HashMap for insertions because it maintains the linked list (to preserve insertion order) 
+in addition to the hashed data structure. Because of this list, iteration is faster.
+
+IdentityHashMap has different performance because it uses == rather than equals( ) for comparisons. 
+WeakHashMap is described later in this chapter.
+

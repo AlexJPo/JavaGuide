@@ -1,0 +1,201 @@
+﻿0) логика такова, создаем JScrollPane, в View-секцию(5) помещаем JTable, 
+	в RowsHeader-секцию(1) помещаем JTable с фиксированными столбцами
+	
+	 ___________________________________
+	|     |                       |     |
+	|     |     Column Header     |     |
+	|_____|_______________________|_____|
+	|     |                       |  V  |
+	|  R  |  ___________________  |  e  |
+	|  o  | |                   | |  r  |
+	|  w  | |                   | |  t  |
+	|     | |                   | |  i  |
+	|  H  | |                   | |  c  |
+	|  e  | |     JViewport     | |  a  |
+	|  a  | |                   | |  l  |
+	|  d  | |                   | |     |
+	|  e  | |                   | | Scr.|
+	|  r  | |___________________| | Bar |
+	|_____|_______________________|_____|
+	|     |                       |     |
+	|     | Horizontal Scroll Bar |     |
+	|_____|_______________________|_____|
+
+
+1) необходимо создать два класса JTable:
+	- table
+	- fixedTable
+
+2) создаем модель класса fixedTable:
+	- если данные не статичны, а изменяются в зависимости от результата выборки(как в нашем случае),
+	  то создаем метод обновления updateModel(List<List<String>> rows, List<String> columns)
+	  где rows - строки таблицы, columns - колонки
+	- после заполнения модели таблицы, необходимо вызвать методы обновления структуры модели и данных:
+		fireTableStructureChanged();
+		fireTableDataChanged();
+	- медот getColumnCount() должен возвращать количество фиксированных колонок
+
+	public class FormFixedTableModel extends AbstractTableModel {
+		List<String> columnNames = new ArrayList<String>();
+		List<List<String>> rowData = new ArrayList<List<String>>();
+
+		public void updateModel(List<List<String>> rows, List<String> columns) {
+			for (String item : columns) {
+				columnNames.add(item);
+			}
+
+			for (List<String> item : rows) {
+				rowData.add(item);
+			}
+
+			fireTableStructureChanged();
+			fireTableDataChanged();
+		}
+
+		@Override
+		public int getRowCount() {
+			return rowData.size();
+		}
+		@Override
+		public int getColumnCount() {
+			return 2;
+		}
+		@Override
+		public String getColumnName(int col) {
+			return columnNames.get(col);
+		}
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			return rowData.get(rowIndex).get(columnIndex);
+		}
+	}
+
+3) создаем модель для таблицы:
+
+	- метод getColumnName должен возвращать именя колонок, 
+	  текущая + max fixedColumn(в нашем случае 2, будет 3и фиксированных, значит начнете с 3)
+	- метод getColumnCount() должен возвращать:
+		количество - max fixedColumn(в нашем случае 2, будет 3и фиксированных, значит начнете с 3)
+	- метод getValueAt() для колонок должен возвращать: 
+		текущая колонка + max fixedColumn(в нашем случае 2, будет 3и фиксированных, значит начнете с 3)
+
+	public class Form1TableModel extends AbstractTableModel {
+		private static final String TITLE_COLUMN = "Наименование показателя";
+		private static final String SORT_NUMBER_COLUMN = "Код строки";
+		private static final String VALUE_COLUMN = "Значение ";
+
+		private List<String> columnNames;
+		private List<List<String>> rowData;
+
+		private List<AccountingRowF1> myModel;
+
+		private LinkedHashMap<Integer, String> rowColumns;
+		private List<String> advancedColumns;
+		private HashMap<String, List<AccountingRowF1>> mappedModel;
+
+		public Form1TableModel() {
+			/* ритуал призыва суккубы */
+		}
+
+		public List<String> getColumnsModel() {
+			List<String> result = new ArrayList<String>();
+
+			result.add(TITLE_COLUMN);
+			result.add(SORT_NUMBER_COLUMN);
+
+			return result;
+		}
+
+		public List<List<String>> getRowsModel() {
+			List<List<String>> result = new ArrayList<List<String>>();
+
+			for (List<String> item : rowData) {
+				List<String> temp = new ArrayList<String>();
+
+				temp.add(item.get(0));
+				temp.add(item.get(1));
+
+				result.add(temp);
+			}
+
+			return rowData;
+		}
+
+		@Override
+		public int getRowCount() {
+			return rowData.size();
+		}
+		@Override
+		public String getColumnName(int column) {
+			return columnNames.get(column + 2);
+		}
+		@Override
+		public int getColumnCount() {
+			return columnNames.size() - 2;
+		}
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			return rowData.get(rowIndex).get(columnIndex + 2);
+		}
+	}
+
+4) задаем свойства для таблиц:
+	- свойства обычной таблицы:
+	reportTable.setFillsViewportHeight(true);
+	reportTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+	- свойства фиксированной таблицы:
+	fixedTableModel.updateModel(tableCompanyModel.getRowsModel(), tableCompanyModel.getColumnsModel());
+	fixedHeaderTable.setModel(fixedTableModel);
+	fixedHeaderTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+5) создаем JVieport компонент:
+	JVieport viewport = new JVieport();
+
+6) помещаем в него табилцу с фиксированными столбцами:
+	viewport.setView(fixedHeaderTable);
+	viewport.setPreferredSize(fixedHeaderTable.getPreferredSize()); - необходима для того, что бы не было пустого пространства
+	между RowHeader и JVieport(смотри схемку выше)
+
+7) добавляем viewport в scrollpane:
+	reportFormScroll.setRowHeaderView(viewport);
+
+8) добавляем колонки фиксированной таблицы в верхний левый угол JScrollPane(смотри схемку):
+	reportFormScroll.setCorner(JScrollPane.UPPER_LEFT_CORNER, fixedHeaderTable.getTableHeader());
+
+9) устанвливаем рахмер колонки:
+	reportFormScroll.getColumnHeader().setPreferredSize(new Dimension(100, 30));
+
+	SWING BUG!
+	Есть особенность работы с внешним видом таблицы и изменениями размеров:
+		setSize(),
+		setPreferredSize(),
+		setMinimumSize(),
+		setMaximumSize()
+
+	Данные методы лучше не использовать при работе с таблицами в swing. Особенно при изменении внешнего вида таблицы.
+	Если задать setPreferredSize() заголовкам таблицы, то HorizontalScrollBar компонента JScrollPane не будет
+	скролить заголовки таблицы, смещаться будут только строки.
+
+10) что бы исправить этот баг нужно:
+	reportFormScroll.getColumnHeader().setPreferredSize(new Dimension(100, 30)); - указать размер не колонкам таблицы, а
+	ColumnHeader компонента JScrollPane(смотри схемку)
+
+11) добавляем resize для фиксированных колонок:
+	fixedHeaderTable.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
+		@Override
+		public void columnAdded(TableColumnModelEvent e) {}
+		@Override
+		public void columnRemoved(TableColumnModelEvent e) {}
+		@Override
+		public void columnMoved(TableColumnModelEvent e) {}
+
+		@Override
+		public void columnMarginChanged(ChangeEvent e) {
+			viewport.setPreferredSize(fixedHeaderTable.getSize());
+		}
+
+		@Override
+		public void columnSelectionChanged(ListSelectionEvent e) {}
+	});
+

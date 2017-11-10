@@ -1,0 +1,15 @@
+﻿1) Что бы ограничить длину выпадающего меню:
+combobox.setPrototypeDisplayValue("XXXXXXXXXXXXXXXXXX");
+где x = 1 букве
+
+2) закрытие выпадющего меню по клавише enter, подстановка значения и обнуленеи модели:
+
+if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+	String item = combobox.getSelectedItem().toString();
+
+	combobox.getEditor().setItem(item);
+	combobox.hidePopup();
+
+	combobox.removeAllItems();
+	combobox.addItem(item);
+}

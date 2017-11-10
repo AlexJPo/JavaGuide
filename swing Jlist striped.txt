@@ -1,0 +1,125 @@
+﻿http://www.codejava.net/java-se/swing/jlist-custom-renderer-example
+
+Creating Striped Renderer for a Swing JList
+Do you think that the default JList is boring? Do you want to spice one up a little? It’s actually a lot simpler than you may think. All you need to do is to change your JList’s list cell renderer. Creating a new renderer class is just a matter of extending DefaultListCellRenderer and overriding the getListCellRendererComponent() method as shown in the code below:
+
+class StripeRenderer extends DefaultListCellRenderer {
+
+  private static final long serialVersionUID = 1L;
+
+  @Override
+  public Component getListCellRendererComponent(JList list, Object value, int index,
+      boolean isSelected, boolean cellHasFocus) {
+
+    JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index,
+        isSelected, cellHasFocus);
+
+    if (index % 2 == 0) {
+      label.setBackground(new Color(230, 230, 255));
+    }
+    return label;
+  }
+}
+
+This is a simple new renderer class that stripes the contents of a list, changing the background colour of every second row. The key line in the above code is the call to the super class’s getListCellRendererComponent() method so that it can do all the hard work in setting up all the other stuff that needs setting up.
+
+As a side point, you’ll notice that the getListCellRendererComponent() returns a JLabel, which means that a JList is just a bunch of labels. Clever eh?
+
+Having written the striped renderer, the final thing to do is test the code and this is done by the test class below.
+
+public class NameListApp extends JFrame {
+  private static final long serialVersionUID = 1L;
+
+  /** A simple set of names to add to the list. */
+  private static final String[] ITEMS = { "John Smith", "Bill Smithers", "Mick Jagger",
+      "Paul Jones", "James T. Kirk", "Willy Rushton" };
+
+  public NameListApp() {
+    // The Window Title
+    super("Striped JList App");
+    initComponents();
+  }
+
+  /**
+   * Method that sets up the size and shape of our application.
+   */
+  private void initComponents() {
+
+    // The first thing to do with all Swing JFrame apps is to get the content pane
+    // You can then add stuff to this...
+    Container cont = getContentPane();
+
+    /*
+     * The usual thing to is to have the first layout as a BorderLayout. Indeed, this is
+     * the default layout method, and so the next line is really superfluous. The border
+     * layout allows you to add normal screen item such as menus, status bars etc.
+     */
+    cont.setLayout(new BorderLayout());
+
+    createFirstLabel(cont, "My Sample List");
+    DefaultListModel listModel = createListModel();
+    createJList(cont, listModel);
+    enableWindow();
+    centre();
+  }
+
+  private void createFirstLabel(Container cont, String text) {
+    /** Create a simple label for the top of the screen */
+    JLabel label = new JLabel(text);
+    cont.add(label, BorderLayout.NORTH);
+  }
+
+  private DefaultListModel createListModel() {
+
+    /* Create a set of items that we're putting into the list */
+    DefaultListModel listModel = new DefaultListModel();
+    addItemsToModel(listModel);
+    return listModel;
+  }
+
+  private void addItemsToModel(DefaultListModel listModel) {
+    for (String name : ITEMS) {
+      listModel.add(0, name);
+    }
+  }
+
+  private void createJList(Container cont, DefaultListModel listModel) {
+
+    JList list = new JList(listModel);
+    /* This is where we set-up the stripe renderer. */
+    list.setCellRenderer(new StripeRenderer());
+    cont.add(list, BorderLayout.SOUTH);
+  }
+
+  private void enableWindow() {
+    setSize(200, 165);
+    setVisible(true);
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  }
+
+  private void centre() {
+
+    Dimension dim = getToolkit().getScreenSize();
+    setLocation(dim.width / 2 - getWidth() / 2, dim.height / 2 - getHeight() / 2);
+  }
+
+  public static void main(String[] args) {
+
+    // Using the SwingUtilities is the correct way to
+    // create a Swing app - it sorts out the EDT (Event Dispatch Thread)
+    // correctly ordering any events.
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+
+        @SuppressWarnings("unused")
+        NameListApp app = new NameListApp();
+      }
+    });
+  }
+}
+
+This adds a bunch of arbitrary names to a JList and it’s all straight forward, the key line here is:
+
+    list.setCellRenderer(new StripeRenderer());
+	
+which adds sets up the JList’s cell renderer.

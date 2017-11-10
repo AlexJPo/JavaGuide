@@ -1,0 +1,17 @@
+﻿1) Колонки и строки могут быть:
+1px - пикселом
+p - prefered
+g - grow
+f - fill
+f:p - fill:prefered
+f:p:g
+p:g
+f:200px:g
+
+columns=""
+
+constrains = "col, row"
+
+2) Что бы использовать colspan и rowspan, необходимо указать в теге:
+constrains = "col, row, colspan, rowspan"
+предварительно задав ячейки для расширения таблицы

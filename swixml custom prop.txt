@@ -1,0 +1,7 @@
+﻿Что бы добавить кастомный атрибут в xml разметке пишем:
+<label sortByDate="true" />
+
+Или пишем в коде:
+org.swixml.Parser.LOCALIZED_ATRIBUTES.add("название атрибута")
+
+Для обращения в коде к атрибуду используется: getClientProperty - swing, getProperties - javaFx
