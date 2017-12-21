@@ -1,0 +1,5 @@
+1) Рассчет разницы между датами в днях
+dateBeginMilliseconds = (sdf.parse(ConverterHelper.parseDate(coupon.getDateStart(), "."))).getTime();
+dateEndMilliseconds = (sdf.parse(ConverterHelper.parseDate(coupon.getDateEnd(), "."))).getTime();
+
+dateDiff = TimeUnit.DAYS.convert(dateEndMilliseconds - dateBeginMilliseconds, TimeUnit.MILLISECONDS);

@@ -1,0 +1,39 @@
+﻿1) инициализация меню
+JPopupMenu popupMenu = new JPopupMenu();
+
+2) добавление пунктов меню
+JMenuItem menuItemAdd = new JMenuItem("Add New Row");
+JMenuItem menuItemRemove = new JMenuItem("Remove Current Row");
+JMenuItem menuItemRemoveAll = new JMenuItem("Remove All Rows");
+ 
+popupMenu.add(menuItemAdd);
+popupMenu.add(menuItemRemove);
+popupMenu.add(menuItemRemoveAll);
+
+3) что бы привязать к таблице
+table.setComponentPopupMenu(popUpMenu);
+
+4) для таблицы создаем событие
+table.addMouseListener(new MouseAdapter() {
+	@Override
+	public void mousePressed(MouseEvent event) {
+		//координаты курсора
+		Point point = event.getPoint();
+		//индекс текущей строки
+		currentRow = table.rowAtPoint(point);
+		//выделение текущей строки
+		table.setRowSelectionInterval(currentRow, currentRow);
+	}
+});
+
+5) для полученяи значеняи в popupMenu
+public void actionPerformed(ActionEvent event) {
+	JMenuItem menu = (JMenuItem) event.getSource();
+	if (menu == menuItemAdd) {
+		addNewRow();
+	} else if (menu == menuItemRemove) {
+		removeCurrentRow();
+	} else if (menu == menuItemRemoveAll) {
+		removeAllRows();
+	}
+}

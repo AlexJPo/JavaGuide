@@ -1,0 +1,173 @@
+﻿Jtable Percentage - varian # 1
+
+private static JTable createTable() {
+    JTable table = new JTable(1, 3);
+    TableColumnModel model = table.getColumnModel();
+ 
+    model.getColumn(0).setHeaderValue("20 %");
+    model.getColumn(1).setHeaderValue("30 %");
+    model.getColumn(2).setHeaderValue("50 %");
+ 
+    setWidthAsPercentages(table, 0.20, 0.30, 0.50);
+    TableModel tableModel = table.getModel();
+ 
+    tableModel.setValueAt("First Column", 0, 0);
+    tableModel.setValueAt("Second Column", 0, 1);
+    tableModel.setValueAt("Third Column", 0, 2);
+}
+ 
+/**
+ * Set the width of the columns as percentages.
+ * 
+ * @param table
+ *            the {@link JTable} whose columns will be set
+ * @param percentages
+ *            the widths of the columns as percentages; note: this method
+ *            does NOT verify that all percentages add up to 100% and for
+ *            the columns to appear properly, it is recommended that the
+ *            widths for ALL columns be specified
+ */
+private static void setWidthAsPercentages(JTable table,
+        double... percentages) {
+    final double factor = 10000;
+ 
+    TableColumnModel model = table.getColumnModel();
+    for (int columnIndex = 0; columnIndex < percentages.length; columnIndex++) {
+        TableColumn column = model.getColumn(columnIndex);
+        column.setPreferredWidth((int) (percentages[columnIndex] * factor));
+    }
+}
+
+Jtable percentages - varian # 2
+
+public MyJFrame() {
+    initComponents();
+    resizeColumns();
+    addComponentListener(new ComponentAdapter() {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            resizeColumns();
+        }
+    });
+}
+//SUMS 100%
+float[] columnWidthPercentage = {20.0f, 55.0f, 10.0f, 5.0f, 5.0f, 5.0f};
+
+private void resizeColumns() {
+    int tW = jTable1.getWidth();
+    TableColumn column;
+    TableColumnModel jTableColumnModel = jTable1.getColumnModel();
+    int cantCols = jTableColumnModel.getColumnCount();
+    for (int i = 0; i < cantCols; i++) {
+        column = jTableColumnModel.getColumn(i);
+        int pWidth = Math.round(columnWidthPercentage[i] * tW);
+        column.setPreferredWidth(pWidth);
+    }
+}
+
+1) при обновлении страницы всегда перемещать скролл наверх:
+JScrollBar vertical = JScrollPane.getVerticalScrollBar();
+vertical.setValue(vertical.getMinimum());
+
+2) выравнивание заголовков таблицы:
+public void alignColumnName(char alightment) {
+	JTableHeader tableHeader = table.getTableHeader();
+	TableCellRenderer rendererFromHeader = tableHeader.getDefaultRenderer();
+	JLabel headerLabel = (JLabel) rendererFromHeader;
+
+	switch (alightment) {
+		case 'l':
+			headerLabel.setHorizontalAlignment(JLabel.LEFT);
+			break;
+		case 'r':
+			headerLabel.setHorizontalAlignment(JLabel.RIGHT);
+			break;
+		case 'c':
+			headerLabel.setHorizontalAlignment(JLabel.CENTER);
+			break;
+	}
+}
+
+3) jtable header style:
+@SuppressWarnings("serial")
+private class MyHeader extends JLabel implements TableCellRenderer {		 
+	public MyHeader() {
+		setFont(new Font("ARIAL", Font.BOLD, 12));
+		setForeground(Color.decode("#969696"));
+		setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+		setHorizontalAlignment(CENTER);
+	}
+	@Override
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		setText(value.toString());
+		
+		return this;
+	}
+}
+
+4) stripped row:
+@Override
+public void makeStrippedRow() {
+	table.setDefaultRenderer(Object.class, new MyRenderer(table.getDefaultRenderer(Object.class)));
+	table.getTableHeader().setDefaultRenderer(new MyHeader());
+}
+
+@Override
+public void makeStrippedRow(String colorEvenRow, String colorOddRow) {
+	this.colorEven = colorEvenRow;
+	this.colorOdd = colorOddRow;
+	
+	table.setDefaultRenderer(Object.class, new MyRenderer(table.getDefaultRenderer(Object.class)));
+	table.getTableHeader().setDefaultRenderer(new MyHeader());
+}
+
+5) select full row by right click
+Jpopupmenu.addPopupMenuListener(new PopupMenuListener() {			
+	@Override
+	public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+		int rowAtPoint = searchResults.rowAtPoint(SwingUtilities.convertPoint(popUpMenu, new Point(0, 0), searchResults));
+		if (rowAtPoint > -1) {
+			searchResults.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+		}
+	}
+});
+
+6) hide columns
+/**
+ * Hide all columns for current table
+ * @param columnsLength - columns count
+ * @param table - current table
+ */
+public static void hideAllColumn(int columnsLength, JTable table) {
+	TableColumn column = null;
+	
+	for (int i = 0; i < columnsLength; i++) {
+		column = table.getColumnModel().getColumn(i);
+		
+		column.setMinWidth(0);
+		column.setMaxWidth(0);
+		column.setPreferredWidth(0);
+	}
+}
+
+7) show columns
+/**
+ * Show columns from configuration file
+ * @param columnsIndex - array of visible column index. Equals current table column model
+ * @param table - current table
+ */
+public static void showVisibleColumns(String columnsIndex[], JTable table) {
+	TableColumn column = null;
+	float[] resize = getTableResizeProperty(table);
+	
+	for(String index : columnsIndex) {				
+		column = table.getColumnModel().getColumn(Integer.parseInt(index));
+		
+		int tableWidth = table.getWidth();
+		int pWidth = Math.round(resize[column.getModelIndex()] * tableWidth);
+			
+		column.setMinWidth(pWidth);
+		column.setMaxWidth(pWidth);
+		column.setPreferredWidth(pWidth);
+	}
+}

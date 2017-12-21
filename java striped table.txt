@@ -1,0 +1,257 @@
+﻿https://tips4java.wordpress.com/2010/01/24/table-row-rendering/
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.table.*;
+import javax.swing.border.*;
+
+public class TableRowRenderingTip extends JPanel
+{
+	public TableRowRenderingTip()
+	{
+		Object[] columnNames = {"Type", "Company", "Shares", "Price", "Boolean"};
+		Object[][] data =
+		{
+			{"Buy", "IBM", new Integer(1000), new Double(80.5), Boolean.TRUE},
+			{"Sell", "Dell", new Integer(2000), new Double(6.25), Boolean.FALSE},
+			{"Short Sell", "Apple", new Integer(3000), new Double(7.35), Boolean.TRUE},
+			{"Buy", "MicroSoft", new Integer(4000), new Double(27.50), Boolean.FALSE},
+			{"Short Sell", "Cisco", new Integer(5000), new Double(20), Boolean.TRUE}
+		};
+
+		DefaultTableModel model = new DefaultTableModel(data, columnNames)
+		{
+			public Class getColumnClass(int column)
+			{
+				return getValueAt(0, column).getClass();
+			}
+		};
+
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.addTab("Alternating", createAlternating(model));
+		tabbedPane.addTab("Border", createBorder(model));
+		tabbedPane.addTab("Data", createData(model));
+		add( tabbedPane );
+	}
+
+	private JComponent createAlternating(DefaultTableModel model)
+	{
+		JTable table = new JTable( model )
+		{
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
+			{
+				Component c = super.prepareRenderer(renderer, row, column);
+
+				//  Alternate row color
+
+				if (!isRowSelected(row))
+					c.setBackground(row % 2 == 0 ? getBackground() : Color.LIGHT_GRAY);
+
+				return c;
+			}
+		};
+
+		table.setPreferredScrollableViewportSize(table.getPreferredSize());
+		table.changeSelection(0, 0, false, false);
+		return new JScrollPane( table );
+	}
+	private JComponent createBorder(DefaultTableModel model)
+	{
+		JTable table = new JTable( model )
+		{
+			private Border outside = new MatteBorder(1, 0, 1, 0, Color.RED);
+			private Border inside = new EmptyBorder(0, 1, 0, 1);
+			private Border highlight = new CompoundBorder(outside, inside);
+
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
+			{
+				Component c = super.prepareRenderer(renderer, row, column);
+				JComponent jc = (JComponent)c;
+
+				// Add a border to the selected row
+
+				if (isRowSelected(row))
+					jc.setBorder( highlight );
+
+				return c;
+			}
+		};
+
+		table.setPreferredScrollableViewportSize(table.getPreferredSize());
+		table.changeSelection(0, 0, false, false);
+		return new JScrollPane( table );
+	}
+	private JComponent createData(DefaultTableModel model)
+	{
+		JTable table = new JTable( model )
+		{
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
+			{
+				Component c = super.prepareRenderer(renderer, row, column);
+
+				//  Color row based on a cell value
+
+				if (!isRowSelected(row))
+				{
+					c.setBackground(getBackground());
+					int modelRow = convertRowIndexToModel(row);
+					String type = (String)getModel().getValueAt(modelRow, 0);
+					if ("Buy".equals(type)) c.setBackground(Color.GREEN);
+					if ("Sell".equals(type)) c.setBackground(Color.YELLOW);
+				}
+
+				return c;
+			}
+		};
+
+		table.setPreferredScrollableViewportSize(table.getPreferredSize());
+		table.changeSelection(0, 0, false, false);
+        table.setAutoCreateRowSorter(true);
+		return new JScrollPane( table );
+	}
+	public static void main(String[] args)
+	{
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				createAndShowGUI();
+			}
+		});
+	}
+	public static void createAndShowGUI()
+	{
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		JFrame frame = new JFrame("Table Row Rendering");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add( new TableRowRenderingTip() );
+		frame.pack();
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+	}
+}
+
+
+
+
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.table.*;
+ 
+public class StripeRenderingTableExample {
+ 
+  class SimpleData extends AbstractTableModel {
+ 
+    int maxCols = 3;
+    int maxRows = 4;
+    String[] columns = {"Item", "Quantity", "Price"};
+    Object[][] data = {
+      {"Potatoes", 1, 10.98},
+      {"Magazine", 2, 7.99},
+      {"Can of soup", 10, 0.89},
+      {"DVD movie", 11, 39.99}
+    };
+ 
+    @Override
+    public String getColumnName(int col) {
+      return columns[col];
+    }
+ 
+    @Override
+    public int getRowCount() {
+      return maxRows;
+    }
+ 
+    @Override
+    public int getColumnCount() {
+      return maxCols;
+    }
+ 
+    @Override
+    public Class getColumnClass(int col) {
+      switch (col) {
+        case 0:
+          return Object.class;
+        case 1:
+          return Integer.class;
+        case 2:
+          return Double.class;
+        default:
+          throw new IllegalArgumentException("Column cannot be greater than 2");
+      }
+    }
+ 
+    @Override
+    public Object getValueAt(int row, int col) {
+      return data[row][col];
+    }
+  }
+ 
+  private class MyRenderer implements TableCellRenderer {
+ 
+    public final DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+    private final TableCellRenderer defaultRenderer;
+ 
+    public MyRenderer(TableCellRenderer defaultRenderer) {
+      this.defaultRenderer = defaultRenderer;
+    }
+ 
+    @Override
+    public Component getTableCellRendererComponent(JTable table,
+            Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      Component component = defaultRenderer.getTableCellRendererComponent(table,
+              value, isSelected, hasFocus, row, column);
+ 
+      Color foreground;
+      Color background;
+      if (isSelected) {
+        foreground = Color.YELLOW;
+        background = Color.GREEN;
+      } else {
+        if (row % 2 == 0) {
+          foreground = Color.BLUE;
+          background = Color.WHITE;
+        } else {
+          foreground = Color.WHITE;
+          background = Color.BLUE;
+        }
+      }
+      component.setForeground(foreground);
+      component.setBackground(background);
+ 
+      return component;
+    }
+  }
+ 
+  public StripeRenderingTableExample() {
+    SimpleData data = new SimpleData();
+    JTable table = new JTable(data);
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    table.setPreferredScrollableViewportSize(new Dimension(800, 500));
+    RowSorter<SimpleData> sorter = new TableRowSorter<SimpleData>(data);
+    table.setRowSorter(sorter);
+ 
+    //now, this here creates the alternating colors in every second row
+    table.setDefaultRenderer(Object.class,
+        new MyRenderer(table.getDefaultRenderer(Object.class)));
+    table.setDefaultRenderer(Integer.class,
+        new MyRenderer(table.getDefaultRenderer(Integer.class)));
+    table.setDefaultRenderer(Double.class,
+        new MyRenderer(table.getDefaultRenderer(Double.class)));
+ 
+    JFrame frame = new JFrame();
+    frame.add(new JScrollPane(table));
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.pack();
+    frame.setVisible(true);
+  }
+ 
+  public static void main(String[] args) {
+    SwingUtilities.invokeLater(new Runnable() {
+ 
+      @Override
+      public void run() {
+        new StripeRenderingTableExample();
+      }
+    });
+  }
+}
