@@ -1,0 +1,52 @@
+- synchronized
+- wait усыпляет поток, при этом доступ к медоту, в котором был вызван wait может быть захвачен другим поток
+- notify уведомляет поток о том, что бы прекратить метод wait
+
+semaphore
+
+Semaphore smaphore = new Semaphore(10) - создание объекта, который будет содержат ьв себе аксимум 10 одновременных потоков
+smaphore.acquire() - добавление потока
+
+try {
+	//some code
+} finaly {
+	smaphore.release(); - завершение потока
+}
+
+CountDownLatch
+
+ReentrantLock
+Condition
+
+Lock lock = new ReentrantLock();
+Condition condition = lock.newCondition();
+
+lock.lock();
+
+try {
+	while (!condotopnSatisfield()) {
+		condition.await();
+	}
+} finally { lock.unlock(); }
+
+lock.lock();
+try {
+	condition.signal();
+} finally { lock.unlock();
+
+
+ReentrantReadWriteLock
+ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+lock.readLock().lock();
+try {
+	readOnlyOperation();
+} finally { lock.readLock().unlock(); }
+
+lock.writeLock().lock();
+try {
+	modifyingOperation();
+} finally { lock.writeLock().lock(); }
+
+
+ForkJoinPool

@@ -1,0 +1,4 @@
+*** Clear table, reset seq ***
+delete from region;
+ALTER SEQUENCE seq RESTART WITH 1;
+UPDATE t SET columid = DEFAULT;
