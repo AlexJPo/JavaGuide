@@ -1,0 +1,156 @@
+1) обавляем следующие зависимости:
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>4.3.12.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>1.5.8.RELEASE</version>
+        </dependency>
+		        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+
+2) регистрирую бины
+	@Bean
+    public JavaMailSender getMailSender(){
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+
+        mailSender.setHost(environment.getProperty("mail.host"));
+        mailSender.setPort(Integer.parseInt(environment.getProperty("mail.port")));
+        mailSender.setUsername(environment.getProperty("mail.username"));
+        mailSender.setPassword(environment.getProperty("mail.password"));
+
+        Properties javaMailProperties = new Properties();
+        javaMailProperties.put("mail.smtp.ssl.enable", "true");
+        javaMailProperties.put("mail.smtps.auth", "true");
+        javaMailProperties.put("mail.transport.protocol", "smtp");
+        javaMailProperties.put("mail.debug", "true");
+
+        mailSender.setJavaMailProperties(javaMailProperties);
+        return mailSender;
+    }
+
+    @Bean
+    public SpringTemplateEngine springTemplateEngine() {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.addTemplateResolver(htmlTemplateResolver());
+        return templateEngine;
+    }
+
+    @Bean
+    public SpringResourceTemplateResolver htmlTemplateResolver(){
+        SpringResourceTemplateResolver emailTemplateResolver = new SpringResourceTemplateResolver();
+        emailTemplateResolver.setPrefix("classpath:/templates/");
+        emailTemplateResolver.setSuffix(".html");
+        emailTemplateResolver.setCacheable(false);
+        emailTemplateResolver.setTemplateMode(StandardTemplateModeHandlers.HTML5.getTemplateModeName());
+        emailTemplateResolver.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        return emailTemplateResolver;
+    }
+	
+3) в application.properties заводим необходимые переменные:
+	mail.host=smtp.yandex.ru
+	mail.port=465
+	mail.username=winewinishkin@yandex.ru
+	mail.password=winewinishkin29112017
+	mail.from=winewinishkin@yandex.ru
+	mail.protocol=smtps
+	mail.smtps.auth=true
+
+4) Создаем сервис контекста контекст:
+	@Autowired
+    private SpringTemplateEngine templateEngine;
+
+    @Autowired
+    public MailContentBuilder(SpringTemplateEngine templateEngine) {
+        this.templateEngine = templateEngine;
+    }
+
+5) передаем объект и регистрируем пременные для html письма:
+    public String build(ArtWineOrder order) {
+        Context context = new Context();
+        context.setVariable("user", order.getUser());
+        context.setVariable("products", order.getProducts());
+        context.setVariable("totalPrice", order.getTotalPrice());
+		
+        return templateEngine.process("mail", context);
+    }
+	
+6) создаем новый сервис и регистрируем в нем зависмости:
+	@Autowired
+	private JavaMailSender mailSender;
+	@Autowired
+	private MailContentBuilder mailContentBuilder;
+
+	@Resource
+	private Environment environment;
+
+7) создаем метод отправки:
+public void prepareAndSend(Model order) 
+
+8) создаем MimeMessage и MimeMessageHelper:
+MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, 
+	MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+	StandardCharsets.UTF_8.name());
+
+messageHelper.setFrom(new InternetAddress(environment.getProperty("mail.from"))); //с какого адресса
+messageHelper.setTo(new InternetAddress(order.getUser().getEmail())); // на какой адрес
+messageHelper.setSubject("Заказ с сайта ArtWine"); // тема
+
+String content = mailContentBuilder.build(order); // передаем объект в контекст
+messageHelper.setText(content, true); // текст письма
+
+9) ЕСЛИ ПОДКЛЮЧАЕМ КАРТИНКУ КАК КАРТИНКУ! ОБЯЗАТЕЛЬНО ПОСЛЕ ТЕЛА ПИСЬМА! ИНАЧЕ РАБОТАТЬ НЕ БУДЕТ!
+ClassPathResource img = new ClassPathResource("logo_white.png");// картинка из resources
+messageHelper.addInline("logo_white.png", img);
+
+10) Отправляему письмо:
+mailSender.send(mimeMessage);
+
+
+@Service
+public class MailClient {
+    @Autowired
+    private JavaMailSender mailSender;
+    @Autowired
+    private MailContentBuilder mailContentBuilder;
+
+    @Resource
+    private Environment environment;
+
+    @Autowired
+    public MailClient(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    public void prepareAndSend(ArtWineOrder order) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage,
+                        MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                        StandardCharsets.UTF_8.name());
+
+            messageHelper.setFrom(new InternetAddress(environment.getProperty("mail.from")));
+            messageHelper.setTo(new InternetAddress(order.getUser().getEmail()));
+
+            messageHelper.setSubject("Заказ с сайта ArtWine");
+
+            String content = mailContentBuilder.build(order);
+            messageHelper.setText(content, true);
+
+            ClassPathResource img = new ClassPathResource("logo_white.png");
+            messageHelper.addInline("logo_white.png", img);
+
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            throw new RuntimeException("Mail send error: ", e);
+        }
+    }
+}
