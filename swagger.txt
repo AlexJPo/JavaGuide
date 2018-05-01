@@ -1,0 +1,107 @@
+1) Добавить зависимости:
+
+	<dependency>
+		<groupId>io.springfox</groupId>
+		<artifactId>springfox-swagger2</artifactId>
+		<version>2.7.0</version>
+	</dependency>
+	<dependency>
+		<groupId>io.springfox</groupId>
+		<artifactId>springfox-data-rest</artifactId>
+		<version>2.7.0</version>
+	</dependency>
+	<dependency>
+		<groupId>io.springfox</groupId>
+		<artifactId>springfox-swagger-ui</artifactId>
+		<version>2.7.0</version>
+	</dependency>
+
+2) Создать файл конфигурации:
+@Configuration
+public class SwaggerConfiguration {
+	...
+}
+
+3) Создать Bean:
+	@Bean
+	public Docket docket() {
+		return new Docket(DocumentationType.SWAGGER_2).select()
+				.apis(RequestHandlerSelectors.basePackage("<Путь к контроллерам>"))
+				.paths(PathSelectors.any())
+				.build()
+				.apiInfo(getApiInfo());
+	}
+
+4) Добамить метод описательной информции документации:
+	private ApiInfo getApiInfo() {
+		return new ApiInfo(
+				"TITLE",
+				"DESCIPRION",
+				"VERSION",
+				"TERMS OF SERVICE URL",
+				new Contact("NAME","URL","EMAIL"),
+				"LICENSE",
+				"LICENSE URL",
+				Collections.emptyList()
+		);
+	}
+
+5) полный листинг класса конфигурации:
+	@Configuration
+	public class SwaggerConfiguration {
+		@Bean
+		public Docket docket() {
+			return new Docket(DocumentationType.SWAGGER_2).select()
+					.apis(RequestHandlerSelectors.basePackage("ru.smartdevelop.wine.controllers"))
+					.paths(PathSelectors.any())
+					.build()
+					.apiInfo(getApiInfo());
+		}
+
+		private ApiInfo getApiInfo() {
+			return new ApiInfo(
+					"TITLE",
+					"DESCIPRION",
+					"VERSION",
+					"TERMS OF SERVICE URL",
+					new Contact("NAME","URL","EMAIL"),
+					"LICENSE",
+					"LICENSE URL",
+					Collections.emptyList()
+			);
+		}
+	}
+
+6) В контроллере добавить аннотацию
+
+@Api(value = "Название в списке доступных контроллеров доступныз по url:port/swagger-ui.html", description = "Описание контроллера", tags = "Regions")
+public class RegionsController {
+   ...
+}
+
+7) Для методов контроллера добавить:
+	@ApiOperation(value = "/{id}", produces = "application/json", tags = "Regions", notes = "Pass region id and return result")
+	public ResponseEntity<List> getRegion(@ApiParam(value = "Описание параметра", required = true)
+											@PathVariable( "id" ) Long id) {
+		...
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
